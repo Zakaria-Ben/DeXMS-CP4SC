@@ -21,5 +21,5 @@ public class MediatorOutput implements Serializable {
 	public String service_name;
 	public String printer_service_port;
 	public String subcomponent_port;
-
+	public String JKSPath;
 }

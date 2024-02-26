@@ -1,6 +1,7 @@
 package org.zefxis.dexms.dex.protocols.mqtts;
 
 import java.util.UUID;
+import java.util.Map.Entry;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import org.json.simple.JSONObject;
 import org.zefxis.dexms.dex.protocols.mqtts.MediatorMQTTSSubscriberCallback;
 import org.zefxis.dexms.dex.protocols.primitives.MediatorGmSubcomponent;
 import org.zefxis.dexms.gmdl.utils.MediatorConfiguration;
+import org.zefxis.dexms.gmdl.utils.Operation;
 import org.zefxis.dexms.gmdl.utils.GmServiceRepresentation;
 
 import org.zefxis.dexms.gmdl.utils.Scope;
@@ -46,30 +48,44 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 	private static String clientId;
 	private MqttClient client = null;
 	MqttClient serverPublisher = null;
+	private static String JKSPath;
+	private static String op_name = null;
+	private static Operation op = null;
 	
 	public MediatorMQTTSSubcomponent(MediatorConfiguration bcConfiguration,
 			GmServiceRepresentation serviceRepresentation) {
 		super(bcConfiguration);
-
+		
 		
 		this.serviceRepresentation = serviceRepresentation;
 		System.out.println("MQTTS "+ this.bcConfiguration.getSubcomponentRole()+" ssl://" + this.bcConfiguration.getSubcomponentAddress() + ":"
 				+ this.bcConfiguration.getSubcomponentPort());
+		System.out.println("JKS PATH:" + bcConfiguration.getJKSPath());
+		System.out.println("JKS PATH:" + bcConfiguration.getJKSPath());
+		System.out.println("JKS PATH:" + bcConfiguration.getJKSPath());
+		JKSPath = this.bcConfiguration.getJKSPath();
+		for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations().entrySet()) {
+
+			op_name = en.getKey();
+			op = en.getValue();
+		}
+				
 		switch (this.bcConfiguration.getSubcomponentRole()) {
 		case SERVER:
 			System.out.println("Configuring the MQTT subscriber");
 			String JKSPath;
-			JKSPath = "/Users/zbenomar/Desktop/certificates-CP4SC/keystore.jks";
+			JKSPath = bcConfiguration.getJKSPath();
+
 			System.out.println("TLS handshake in progress");
 			try {
-			options_server = SSL_conf (JKSPath);
+			options_server = SSL_conf ();
 			System.out.println("TLS handshake succesfully terminated, OK");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("A problem while doing the TLS handshake");
 				e.printStackTrace();
 			}		
-			broker = "ssl://localhost:2032";
+			broker = "ssl://"+this.bcConfiguration.getServiceAddress()+":"+this.bcConfiguration.getSubcomponentPort();
 			clientId = "Dexclient"+UUID.randomUUID();
 			System.out.println("Client configuration:");
 			System.out.println("The broker address: ssl://"+ this.bcConfiguration.getSubcomponentAddress() +":"+ this.bcConfiguration.getSubcomponentPort());
@@ -87,23 +103,25 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 			// Configuration of the client: TLS handshake, ID,...
 			System.out.println("Configuring the MQTT subscriber");
 			String JKSPath_client;
-			JKSPath_client = "/Users/zbenomar/Desktop/certificates-CP4SC/keystore.jks";
+			JKSPath_client = bcConfiguration.getJKSPath();
+					
 			System.out.println("TLS handshake in progress");
 			try {
-			options = SSL_conf (JKSPath_client);
+			options = SSL_conf ();
 			System.out.println("TLS handshake succesfully terminated, OK");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("A problem while doing the TLS handshake");
 				e.printStackTrace();
 			}		
-			broker = "ssl://localhost:2032";
+			broker = "ssl://"+this.bcConfiguration.getServiceAddress()+":"+this.bcConfiguration.getSubcomponentPort();
 			clientId = "Dexclient"+UUID.randomUUID();
 			System.out.println("Client configuration:");
 			System.out.println("The broker address: ssl://"+ this.bcConfiguration.getSubcomponentAddress() +":"+ this.bcConfiguration.getSubcomponentPort());
 			System.out.println("The client ID used:"+ clientId);
 			
 			try {
+				
 				client = new MqttClient(broker, clientId, new MemoryPersistence());
 			} catch (MqttException e) {
 				// TODO Auto-generated catch block
@@ -152,19 +170,44 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
      // Create an SslConnectionFactory with the SSL context
        
 			// Subscribe to a topic
-			String topic = "randomValue";
-			try {
-				client.subscribe(topic);
-			} catch (MqttException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			
+			System.out.println(" ServiceRepresentation  "+serviceRepresentation.getInterfaces().get(0).getOperations()
+					.entrySet().size());
+			
+			for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations()
+					.entrySet()) {
+				try {
+					client.subscribe((String) en.getKey());
+					if(client.isConnected()){
+						System.out.println(client.getClientId()+"subribes topic "+(String) en.getKey());
+						
+					}else{
+						
+						System.out.println("Not connected");
+					}
+				} catch (MqttException e) {
+					e.printStackTrace();
+				}
+				
 			}
-
 			break;
+			
+			
+			
+			
+//			String topic = this.bcConfiguration.get;
+//			try {
+//				client.subscribe(topic);
+//			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+
+//			break;
 
 		default:
 
-			break;
+//			break;
 		}
 	}
 
@@ -293,7 +336,7 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 	
 	// This function is used for the TLS/SSL configuration
 
-	public MqttConnectOptions SSL_conf (String JKSPath) {
+	public MqttConnectOptions SSL_conf () {
 		KeyStore keyStore = null;
 	try {
 		keyStore = KeyStore.getInstance("JKS");
@@ -305,7 +348,9 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 
 	FileInputStream keyStoreFile = null;
 	try {
-		keyStoreFile = new FileInputStream("/Users/zbenomar/Desktop/certificates-CP4SC/keystore.jks");
+		//keyStoreFile = new FileInputStream("/Users/zbenomar/Desktop/certificates-CP4SC/keystore.jks");
+		keyStoreFile = new FileInputStream(JKSPath);
+
 	} catch (FileNotFoundException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();

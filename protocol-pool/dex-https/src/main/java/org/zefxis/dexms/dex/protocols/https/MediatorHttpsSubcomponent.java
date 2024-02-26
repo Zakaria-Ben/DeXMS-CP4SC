@@ -67,11 +67,16 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 	private static SSLContext sslContext;
 	private static String hostAddress;
 	private static String port;
+	private static String JKSPath;
 	
 	public MediatorHttpsSubcomponent(MediatorConfiguration bcConfiguration,
 			GmServiceRepresentation serviceRepresentation) {
 		
 		super(bcConfiguration);
+		
+		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
+		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
+		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
 
 		System.out.println("MediatorHttpsSubcomponent --> "+this.bcConfiguration.getSubcomponentRole());
 
@@ -86,6 +91,7 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 		System.out.println("this.bcConfiguration.getSubcomponentAddress(): "+this.bcConfiguration.getSubcomponentAddress());
 		String[] parts = this.bcConfiguration.getSubcomponentAddress().split(":");
 		
+		JKSPath = this.bcConfiguration.getJKSPath();
 		if (parts.length == 2) {
             hostAddress = parts[0];
             port = parts[1];}
@@ -393,8 +399,9 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        try (FileInputStream keyStoreFile = new FileInputStream("/Users/zbenomar/eclipse-workspace/Testjetty2/src/main/java/testjetty2/mykeystore.jks")) {
-            keyStore.load(keyStoreFile, "testtest".toCharArray());
+        //try (FileInputStream keyStoreFile = new FileInputStream("/Users/zbenomar/eclipse-workspace/Testjetty2/src/main/java/testjetty2/mykeystore.jks")) {
+        try (FileInputStream keyStoreFile = new FileInputStream(JKSPath)){
+        	keyStore.load(keyStoreFile, "testtest".toCharArray());
         }
         
      // Initialize KeyManagerFactory with the keystore

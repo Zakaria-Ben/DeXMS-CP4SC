@@ -14,6 +14,7 @@ public class MediatorConfiguration {
   private String serviceAddress;
   private Integer servicePort;
   private String generatedCodePath = "src/main/resources";
+  private String JKSPath;
   
   public MediatorConfiguration() {
     // TODO Auto-generated constructor stub
@@ -22,6 +23,14 @@ public class MediatorConfiguration {
   public MediatorConfiguration(String jsonConfiguration) {
     // TODO Auto-generated constructor stub
   }
+  public String getJKSPath() {
+	    return JKSPath;
+	  }
+  
+  public void setJKSPath(String path) {
+	    this.JKSPath = path;
+	  }  
+  
   
   public String getSubcomponentAddress() {
     return subcomponentAddress;
@@ -112,6 +121,8 @@ public class MediatorConfiguration {
     	setServiceAddress((String) jsonObject.get("invocation_address"));
     if(jsonObject.get("service_port") != null)
     	setServicePort((int)Integer.parseInt((String)jsonObject.get("service_port")));
+    if(jsonObject.get("JKSPath") != null)
+    	setJKSPath((String) jsonObject.get("JKSPath"));
     
     setSubcomponentAddress((String) jsonObject.get("subcomponent_address"));
     
