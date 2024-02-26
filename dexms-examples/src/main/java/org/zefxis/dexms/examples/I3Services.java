@@ -6,7 +6,6 @@ import org.zefxis.dexms.gmdl.utils.enums.ProtocolType;
 import org.zefxis.dexms.mediator.generator.MediatorGenerator;
 import org.zefxis.dexms.mediator.manager.MediatorOutput;
 
-
 public class I3Services {
 		public static void main(String[] args) {
 			// TODO Auto-generated method stub
@@ -14,19 +13,23 @@ public class I3Services {
 			MediatorGenerator mediator = new MediatorGenerator();
 
 			// Corresponds to the IP address and port number of the MQTT broker
-			mediator.setServiceEndpoint("127.0.0.1", "2000");
+			mediator.setServiceEndpoint("localhost", "2032");
 
 			// Corresponds to the IP address and port number of the CoAP endpoint
-			mediator.setBusEndpoint("127.0.0.1", "2032");
+			mediator.setBusEndpoint("localhost", "3000");
+			
+			//mediator.setSecurity("/Users/zbenomar/eclipse-workspace/Testjetty2/src/main/java/testjetty2/mykeystore.jks");
+			mediator.setSecurity("/Users/zbenomar/Desktop/CP4SC-Demo/DeXMS-CP4SC/dexms-examples/keystore.jks");
 
+			
+			String Path = "/Users/zbenomar/Desktop/CP4SC-Demo/DeXMS-CP4SC/dexms-examples/keystore.jks";
+			
 			String gidlFile = "src/main/java/org/zefxis/dexms/examples/randomValue.gidl";
-			MediatorOutput output = mediator.generate(gidlFile, ProtocolType.MQTTS, "REST_to_MQTTS");
+			MediatorOutput output = mediator.generate(gidlFile, ProtocolType.HTTPS, "MQTTS_TO_HTTPS", Path);
 			try {
-				FileUtils.writeByteArrayToFile(new File("REST_to_MQTTS.jar"), output.jar);
+				FileUtils.writeByteArrayToFile(new File("MQTTS_TO_HTTPS.jar"), output.jar);
 			} 
 			catch (IOException e) {e.printStackTrace();}
-			
-		
 			
 		}
 	}
