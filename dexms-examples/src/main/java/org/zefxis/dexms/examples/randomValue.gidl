@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gidl:GIDLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gidl="http://eu.chorevolution/modelingnotations/gidl" hostAddress="127.0.0.1" protocol="MQTTS">
+<gidl:GIDLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gidl="http://eu.chorevolution/modelingnotations/gidl" hostAddress="127.0.0.1" protocol="REST">
   <hasInterfaces role="provider">
     <hasOperations name="randomValue" type="one_way" qos="reliable">
       <hasScope name="randomValue" verb="POST" uri="randomValue"/>

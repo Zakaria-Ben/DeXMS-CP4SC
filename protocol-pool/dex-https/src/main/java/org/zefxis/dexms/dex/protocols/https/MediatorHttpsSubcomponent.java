@@ -554,13 +554,13 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 					datas.add(d);
 					// System.err.println("Added " + d);
 				}
-				Data d = new Data<String>("op_name", "String", true, op_name, "BODY");
+				//Data d = new Data<String>("op_name", "String", true, op_name, "BODY");
 				//datas.add(d);
-				if(!message_id.equals("")){
+				//if(!message_id.equals("")){
 					
-					d = new Data<String>("message_id", "String", true, message_id, "BODY");
-					datas.add(d);
-				}
+				//	d = new Data<String>("message_id", "String", true, message_id, "BODY");
+				//	datas.add(d);
+				//}
 				
 				if (op.getOperationType() == OperationType.TWO_WAY_SYNC) {
 
