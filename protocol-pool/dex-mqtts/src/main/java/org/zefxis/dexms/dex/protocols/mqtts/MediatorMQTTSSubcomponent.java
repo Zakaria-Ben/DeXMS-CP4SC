@@ -48,7 +48,8 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 	private static String clientId;
 	private MqttClient client = null;
 	MqttClient serverPublisher = null;
-	private static String JKSPath;
+	private static String JKSPathService;
+	private static String JKSPathBus;
 	private static String op_name = null;
 	private static Operation op = null;
 	
@@ -60,10 +61,16 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 		this.serviceRepresentation = serviceRepresentation;
 		System.out.println("MQTTS "+ this.bcConfiguration.getSubcomponentRole()+" ssl://" + this.bcConfiguration.getSubcomponentAddress() + ":"
 				+ this.bcConfiguration.getSubcomponentPort());
-		System.out.println("JKS PATH:" + bcConfiguration.getJKSPath());
-		System.out.println("JKS PATH:" + bcConfiguration.getJKSPath());
-		System.out.println("JKS PATH:" + bcConfiguration.getJKSPath());
-		JKSPath = this.bcConfiguration.getJKSPath();
+
+		JKSPathBus = this.bcConfiguration.getJKSPathBus();
+		JKSPathService = this.bcConfiguration.getJKSPathService();
+		
+		
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+		System.out.println("JKSPathBus: "+JKSPathBus);
+		System.out.println("JKSPathBus: "+ JKSPathService);
+		
+		
 		for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations().entrySet()) {
 
 			op_name = en.getKey();
@@ -73,12 +80,10 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 		switch (this.bcConfiguration.getSubcomponentRole()) {
 		case SERVER:
 			System.out.println("Configuring the MQTT subscriber");
-			String JKSPath;
-			JKSPath = bcConfiguration.getJKSPath();
 
 			System.out.println("TLS handshake in progress");
 			try {
-			options_server = SSL_conf ();
+			options_server = SSL_conf ("Bus");
 			System.out.println("TLS handshake succesfully terminated, OK");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -102,12 +107,10 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 		case CLIENT:
 			// Configuration of the client: TLS handshake, ID,...
 			System.out.println("Configuring the MQTT subscriber");
-			String JKSPath_client;
-			JKSPath_client = bcConfiguration.getJKSPath();
 					
 			System.out.println("TLS handshake in progress");
 			try {
-			options = SSL_conf ();
+			options = SSL_conf ("Service");
 			System.out.println("TLS handshake succesfully terminated, OK");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -336,7 +339,7 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 	
 	// This function is used for the TLS/SSL configuration
 
-	public MqttConnectOptions SSL_conf () {
+	public MqttConnectOptions SSL_conf (String type) {
 		KeyStore keyStore = null;
 	try {
 		keyStore = KeyStore.getInstance("JKS");
@@ -347,14 +350,27 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 
 
 	FileInputStream keyStoreFile = null;
-	try {
-		//keyStoreFile = new FileInputStream("/Users/zbenomar/Desktop/certificates-CP4SC/keystore.jks");
-		keyStoreFile = new FileInputStream(JKSPath);
+	if (type == "Bus") {
+		try {
+			//keyStoreFile = new FileInputStream("/Users/zbenomar/Desktop/certificates-CP4SC/keystore.jks");
+			keyStoreFile = new FileInputStream(JKSPathBus);
 
-	} catch (FileNotFoundException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+	else if (type == "Service") {
+		try {
+			//keyStoreFile = new FileInputStream("/Users/zbenomar/Desktop/certificates-CP4SC/keystore.jks");
+			keyStoreFile = new FileInputStream(JKSPathService);
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	try {
 		keyStore.load(keyStoreFile, "testtest".toCharArray());
 	} catch (NoSuchAlgorithmException e) {

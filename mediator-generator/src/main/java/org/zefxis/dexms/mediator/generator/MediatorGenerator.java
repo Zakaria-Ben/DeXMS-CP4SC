@@ -196,9 +196,21 @@ public class MediatorGenerator{
     	mapParameter.put("port_bus", port);
 	}
     
-    public void setSecurity(String path) {
-    	mapParameter.put("JKSPath", path);
-    }
+    public void setBusEndpointSecurity(String path){
+		
+    	mapParameter.put("JKSPathBus", path);
+	}
+
+    public void setServiceEndpointSecurity(String path){
+		
+    	mapParameter.put("JKSPathService", path);
+	}
+    
+    
+    
+    //public void setSecurity(String path) {
+    //	mapParameter.put("JKSPath", path);
+    //}
 	
 	/******************************************************************************************************/
 
@@ -375,8 +387,14 @@ public class MediatorGenerator{
 		MediatorOutput vsbOutput = new MediatorOutput();
 		vsbOutput.generatedCodePath = Constants.generatedCodePath;
 		vsbOutput.service_name = Constants.service_name;
-		String path = mapParameter.get("JKSPath");
-		vsbOutput.JKSPath = path;
+		String path_Bus = mapParameter.get("JKSPathBus");
+		String path_Service = mapParameter.get("JKSPathService");
+		vsbOutput.JKSPathBus = path_Bus;
+		vsbOutput.JKSPathService = path_Service;
+		
+		System.out.println("This is the BUS TLS:"+ vsbOutput.JKSPathBus);
+		System.out.println("This is the Service TLS:"+ vsbOutput.JKSPathService);
+		
 		
 		Class[] classesOptions = new Class[]{
 
@@ -411,6 +429,7 @@ public class MediatorGenerator{
 				vsbOutput.bc_manager_servlet_port = Constants.bc_manager_servlet_port;
 				vsbOutput.printer_service_port = Constants.printer_service_port;
 				vsbOutput.subcomponent_port = Constants.subcomponent_port;
+				
 			}
 			generator.compileGeneratedClasses(classesOptions);
 			jarGenerator.setBusProtocol(this.busProtocol);
@@ -429,9 +448,13 @@ public class MediatorGenerator{
 		bcConfiguration = new MediatorConfiguration();
 
 		bcConfiguration.setGeneratedCodePath(Constants.generatedCodePath);
-		String path = mapParameter.get("JKSPath");
-		bcConfiguration.setJKSPath(path);		
+		String path_Bus = mapParameter.get("JKSPathBus");
+		String path_Service = mapParameter.get("JKSPathService");
+		bcConfiguration.setJKSPathBus(path_Bus);	
+		bcConfiguration.setJKSPathService(path_Service);
 
+		System.out.println("bcConfiguration BUS: "+ bcConfiguration.getJKSPathBus());
+		System.out.println("bcConfiguration Service: "+ bcConfiguration.getJKSPathService());
 		GmServiceRepresentation gmServiceRepresentation = null;
 
 		String interfaceDescFileExtension = "";
@@ -976,10 +999,6 @@ public class MediatorGenerator{
     	
     	
 		String configPath = PathResolver.myFilePath(MediatorManagerRestService.class, "config.json");
-		System.out.println("This is the config file path:" +configPath);
-		System.out.println("This is the config file path:" +configPath);
-		System.out.println("This is the config file path:" +configPath);
-		System.out.println("This is the config file path:" +configPath);
 		JSONParser configParser = new JSONParser();
 		JSONObject configJsonObject = null;
 
@@ -1005,7 +1024,7 @@ public class MediatorGenerator{
 
 		String host_bus = mapParameter.get("host_bus");
 		String port = mapParameter.get("port_bus");
-		String path = mapParameter.get("JKSPath");
+		String path = mapParameter.get("JKSPathBus");
 		
 		switch (protocol) {
 
@@ -1092,10 +1111,7 @@ public class MediatorGenerator{
 			jsonObject.put("service_port", port);
 			jsonObject.put("subcomponent_address", host_bus);
 			jsonObject.put("invocation_address", host_bus);
-			System.out.println("Cration of the configuration file:" + path);
-			System.out.println("Cration of the configuration file:" + path);
-			System.out.println("Cration of the configuration file:" + path);
-			jsonObject.put("JKSPath", path);
+			jsonObject.put("JKSPathBus", path);
 			break;
 			
 		case MQTTS:
@@ -1106,7 +1122,7 @@ public class MediatorGenerator{
 			jsonObject.put("service_port", port);
 			jsonObject.put("subcomponent_address", host_bus);
 			jsonObject.put("invocation_address", host_bus);
-			jsonObject.put("JKSPath", path);
+			jsonObject.put("JKSPathBus", path);
 			break;
 		}
 			
@@ -1153,7 +1169,7 @@ public class MediatorGenerator{
 		String port = mapParameter.get("port_service");
 		System.out.println("Port:" + mapParameter.get("subcomponent_port"));
 		
-		String JKSPath = mapParameter.get("JKSPath");
+		String JKSPathService = mapParameter.get("JKSPathService");
 		
 		switch (protocol) {
 
@@ -1199,7 +1215,7 @@ public class MediatorGenerator{
 			jsonObject.put("service_port", port);
 			jsonObject.put("subcomponent_address", host_service);
 			jsonObject.put("invocation_address", host_service);
-			jsonObject.put("JKSPath", JKSPath);
+			jsonObject.put("JKSPathService", JKSPathService);
 
 			break;
 			
@@ -1254,10 +1270,7 @@ public class MediatorGenerator{
 			jsonObject.put("service_port", port);
 			jsonObject.put("subcomponent_address", host_service+":"+port);
 			jsonObject.put("invocation_address", "http://"+host_service+":"+port+"/");
-			System.out.println("Cration of the configuration file:" + JKSPath);
-			System.out.println("Cration of the configuration file:" + JKSPath);
-			System.out.println("Cration of the configuration file:" + JKSPath);
-			jsonObject.put("JKSPath", JKSPath);
+			jsonObject.put("JKSPathService", JKSPathService);
 			
 			break;
 		}

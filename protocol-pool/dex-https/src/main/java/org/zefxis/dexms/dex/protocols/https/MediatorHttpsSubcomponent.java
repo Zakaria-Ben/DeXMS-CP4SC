@@ -67,17 +67,14 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 	private static SSLContext sslContext;
 	private static String hostAddress;
 	private static String port;
-	private static String JKSPath;
+	private static String JKSPathBus;
+	private static String JKSPathService;
 	
 	public MediatorHttpsSubcomponent(MediatorConfiguration bcConfiguration,
 			GmServiceRepresentation serviceRepresentation) {
 		
 		super(bcConfiguration);
 		
-		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
-		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
-		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
-
 		System.out.println("MediatorHttpsSubcomponent --> "+this.bcConfiguration.getSubcomponentRole());
 
 		setGmServiceRepresentation(serviceRepresentation);
@@ -91,7 +88,9 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 		System.out.println("this.bcConfiguration.getSubcomponentAddress(): "+this.bcConfiguration.getSubcomponentAddress());
 		String[] parts = this.bcConfiguration.getSubcomponentAddress().split(":");
 		
-		JKSPath = this.bcConfiguration.getJKSPath();
+		JKSPathBus = this.bcConfiguration.getJKSPathBus();
+		JKSPathService = this.bcConfiguration.getJKSPathService();
+
 		if (parts.length == 2) {
             hostAddress = parts[0];
             port = parts[1];}
@@ -120,7 +119,7 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 
 		server = new Server();
 		try {
-			SSLconf(restservicePort, hostAddress, server);
+			SSLconf(restservicePort, hostAddress, server, "Bus");
 			System.out.println("restservicePort: "+restservicePort);
 			System.out.println("hostAddress: "+hostAddress);
 			
@@ -152,7 +151,7 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 			
 			server_client = new Server();
 			try {
-				SSLconf(port_https_client, hostAddress, server_client);
+				SSLconf(port_https_client, hostAddress, server_client, "Service");
 				
 			} catch (UnrecoverableKeyException e) {
 				// TODO Auto-generated catch block
@@ -388,8 +387,10 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 	// This is used to configure the SSL certificate
-	public static void SSLconf (int port, String host, Server server) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyStoreException {
+	public static void SSLconf (int port, String host, Server server, String type) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyStoreException {
     	// Configure SSL
         // Load your keystore (containing your SSL certificate) and truststore if needed
         KeyStore keyStore = null;
@@ -400,10 +401,19 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 			e.printStackTrace();
 		}
         //try (FileInputStream keyStoreFile = new FileInputStream("/Users/zbenomar/eclipse-workspace/Testjetty2/src/main/java/testjetty2/mykeystore.jks")) {
-        try (FileInputStream keyStoreFile = new FileInputStream(JKSPath)){
-        	keyStore.load(keyStoreFile, "testtest".toCharArray());
-        }
         
+		if (type=="Bus") {
+			try (FileInputStream keyStoreFile = new FileInputStream(JKSPathBus)){
+	        	keyStore.load(keyStoreFile, "testtest".toCharArray());
+			}	
+		}
+		
+		else if (type=="Service") {
+			try (FileInputStream keyStoreFile = new FileInputStream(JKSPathService)){
+	        	keyStore.load(keyStoreFile, "testtest".toCharArray());
+		}
+		}
+		
      // Initialize KeyManagerFactory with the keystore
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(keyStore, "testtest".toCharArray());
@@ -521,7 +531,7 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 			}
 			processing(receivedText);
 
-	    }
+		}
 	
 	}
 	public static void processing(String receivedText) {

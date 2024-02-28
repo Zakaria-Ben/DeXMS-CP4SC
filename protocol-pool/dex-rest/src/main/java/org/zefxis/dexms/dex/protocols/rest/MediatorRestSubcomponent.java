@@ -79,9 +79,6 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 	) {
 		super(bcConfiguration);
 		
-		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
-		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
-		System.out.println("This is the used JKS Path:"+this.bcConfiguration.getJKSPath());
 
 		System.out.println("MediatorHttpsSubcomponent --> "+this.bcConfiguration.getSubcomponentRole());
 
@@ -579,11 +576,12 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 		//this.notifyStartEvent();	
 		//String op_name = (String) jsonObject.get("op_name");
 		//System.out.print("serviceRepresentation:"+serviceRepresentation.getInterfaces().get(0).getOperations().entrySet());
+		List<Data<?>> datas = new ArrayList<>();
 		
 		//for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations().entrySet()) {
 		//	if (en.getKey().equals(op_name)) {
 		//		Operation op = en.getValue();
-				List<Data<?>> datas = new ArrayList<>();
+				
 				System.out.println("Starting the loop 1");
 				for (Data<?> data : op.getGetDatas()) {
 					Data d = new Data<String>(data.getName(), "String", true, (String) jsonObject.get(data.getName()),
@@ -615,13 +613,9 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 					System.out.println("Terminated");
 				}
 			}
-		
-		
-		
-		
+//}
 		
 	
-
 	public class SendMessage extends Thread {
 
 		String message = null;
