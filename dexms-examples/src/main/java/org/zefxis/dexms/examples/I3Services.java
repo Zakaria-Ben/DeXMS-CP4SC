@@ -16,13 +16,13 @@ public class I3Services {
 			mediator.setServiceEndpoint("localhost", "2032");
 
 			// Corresponds to the IP address and port number of the CoAP endpoint
-			mediator.setBusEndpoint("localhost", "4000");
+			mediator.setBusEndpoint("localhost", "3333");
 			
 			//mediator.setSecurity("/Users/zbenomar/eclipse-workspace/Testjetty2/src/main/java/testjetty2/mykeystore.jks");
 			mediator.setBusEndpointSecurity("/Users/zbenomar/Desktop/CP4SC-Demo/DeXMS-CP4SC/dexms-examples/keystore.jks");
 
 			mediator.setServiceEndpointSecurity("/Users/zbenomar/Desktop/CP4SC-Demo/DeXMS-CP4SC/dexms-examples/keystore.jks");
-
+			
 			
 			String gidlFile = "src/main/java/org/zefxis/dexms/examples/randomValue.gidl";
 			MediatorOutput output = mediator.generate(gidlFile, ProtocolType.HTTPS, "MQTTS_TO_HTTPS");

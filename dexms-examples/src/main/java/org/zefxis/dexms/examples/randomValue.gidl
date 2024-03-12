@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gidl:GIDLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gidl="http://eu.chorevolution/modelingnotations/gidl" hostAddress="127.0.0.1" protocol="MQTTS">
   <hasInterfaces role="provider">
-    <hasOperations name="randomValue" type="one_way" qos="reliable">
-      <hasScope name="randomValue" verb="POST" uri="randomValue"/>
+    <hasOperations name="value" type="one_way" qos="reliable">
+      <hasScope name="value" verb="POST" uri="randomValue"/>
       <inputData name="request" context="body" media="json">
         <hasDataType xsi:type="gidl:SimpleType" name="randomValue" minOccurs="one" maxOccurs="one" type="string"/>
       </inputData>

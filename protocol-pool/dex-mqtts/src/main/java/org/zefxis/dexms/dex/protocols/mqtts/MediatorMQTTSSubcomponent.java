@@ -255,7 +255,7 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 		message.setPayload(jsonObject.toJSONString().getBytes());
 		try {
 		
-			serverPublisher.publish("randomValue", message);
+			serverPublisher.publish(scope.getUri(), message);
 		} catch (MqttPersistenceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
