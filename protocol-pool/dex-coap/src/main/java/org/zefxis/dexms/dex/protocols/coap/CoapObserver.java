@@ -83,17 +83,77 @@ public class CoapObserver implements Runnable {
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
+						
 
 						List<Data<?>> datas = new ArrayList<>();
 
 						for (Data<?> data : op.getGetDatas()) {
-							Data d = new Data<String>(data.getName(), "String", true,
-									String.valueOf(jsonObject.get(data.getName())), data.getContext(),
-									data.getMediaType());
-							datas.add(d);
-							context = data.getContext();
-							media = data.getMediaType();
+							String stringValue = String.valueOf(jsonObject.get(data.getName()));
+						    boolean parsingSuccessful = false; // Flag to track if parsing was successful
+							try {
+								int intValue = Integer.parseInt(stringValue);
+								@SuppressWarnings("unchecked")
+								Data<Integer> d = new Data(data.getName(), "Integer", true,
+										intValue, data.getContext(),
+										data.getMediaType());
+								datas.add(d);
+								System.out.println("This is data: "+ d);
+								context = data.getContext();
+								media = data.getMediaType();
+								parsingSuccessful = true; // Set flag to true
+							}
+							catch (NumberFormatException e) {
+								
+							}
+							if (!parsingSuccessful) {
+			
+							try {
+								Float floatValue = Float.parseFloat(stringValue);
+								@SuppressWarnings("unchecked")
+								Data<Float> d = new Data(data.getName(), "Float", true,
+										floatValue, data.getContext(),
+										data.getMediaType());
+								datas.add(d);
+								System.out.println("This is data: "+ d);
+								context = data.getContext();
+								media = data.getMediaType();
+								parsingSuccessful = true; // Set flag to true
+							}
+							catch (NumberFormatException e) {
+								
+							}
+							}
+							
+							if (!parsingSuccessful) {
+							
+							try {
+								Long longValue = Long.parseLong(stringValue);
+								@SuppressWarnings("unchecked")
+								Data<Long> d = new Data(data.getName(), "Long", true,
+										longValue, data.getContext(),
+										data.getMediaType());
+								datas.add(d);
+								System.out.println("This is data: "+ d);
+								context = data.getContext();
+								media = data.getMediaType();
+								parsingSuccessful = true; // Set flag to true
+							}
+							catch (NumberFormatException e) {
+								
+							}
+							if (!parsingSuccessful) {
+								// Parsing failed for all types, treat as String
+						        Data<String> d = new Data<>(data.getName(), "String", true,
+						                                     stringValue, data.getContext(), data.getMediaType());
+						        datas.add(d);
+						        context = data.getContext();
+						        media = data.getMediaType();
+						    }
+							
+							}
 						}
+						
+
 
 						if (!message_id.equals("")) {
 

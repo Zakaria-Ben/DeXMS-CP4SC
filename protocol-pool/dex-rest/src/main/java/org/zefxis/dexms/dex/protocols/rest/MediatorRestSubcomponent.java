@@ -192,10 +192,14 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 		JSONObject msgObj = new JSONObject();
 		String message_id = "";
 		for (Data d : datas) {
-
+			
+			System.out.println("d.getObject():" + d.getObject());
+			System.out.println("Type:"+ d.getObject().getClass().getName());
+			System.out.println("Type:"+ d.getObject().getClass().getName());
+			
 			if (!d.getName().equals("message_id")) {
 
-				msgObj.put(d.getName(), d.getObject().toString());
+				msgObj.put(d.getName(), d.getObject());
 
 			} else {
 
@@ -210,6 +214,7 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			message = msgObj.toJSONString() + "-" + message_id;
 		}
 		
+		System.out.println("this is what I'm posting with HTTP: "+ message);
 		try {
 		Request request = new Request();
 		String URL = "http://"+bcConfiguration.getServiceAddress()+":"+bcConfiguration.getSubcomponentPort()+"/"+op_name+"/";
