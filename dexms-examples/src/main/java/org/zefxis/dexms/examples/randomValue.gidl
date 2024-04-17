@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gidl:GIDLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gidl="http://eu.chorevolution/modelingnotations/gidl" hostAddress="127.0.0.1" protocol="REST">
+<gidl:GIDLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gidl="http://eu.chorevolution/modelingnotations/gidl" hostAddress="127.0.0.1" protocol="CoAP">
   <hasInterfaces role="provider">
     <hasOperations name="randomValue" type="one_way" qos="reliable">
       <hasScope name="randomValue" verb="POST" uri="randomValue"/>
       <inputData name="request" context="body" media="json">
-        <hasDataType xsi:type="gidl:SimpleType" name="randomValue" minOccurs="one" maxOccurs="one" type="string"/>
+        <hasDataType xsi:type="gidl:SimpleType" name="randomValue1" minOccurs="one" maxOccurs="one" type="integer"/>
+        <hasDataType xsi:type="gidl:SimpleType" name="randomValue2" minOccurs="one" maxOccurs="one" type="integer"/>
+        
       </inputData>
     </hasOperations>
   </hasInterfaces>

@@ -163,7 +163,9 @@ public class MediatorCoapsSubcomponent extends MediatorGmSubcomponent {
 	@Override
 	public void mgetOneway(Scope scope, Object exchange) {
 		// TODO Auto-generated method stub
-		System.out.println("This is mgetOneway CoAP");
+		System.out.println("This is mgetOneway CoAPS");
+		System.out.println(exchange);
+		
 		this.nextComponent.postOneway(this.bcConfiguration.getServiceAddress(), scope, (List<Data<?>>) exchange, 0);
 	}
 

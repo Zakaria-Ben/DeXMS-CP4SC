@@ -67,12 +67,14 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 	private static SSLContext sslContext;
 	private static String hostAddress;
 	private static String port;
+	private static String JKSPathBus;
+	private static String JKSPathService;
 	
 	public MediatorHttpsSubcomponent(MediatorConfiguration bcConfiguration,
 			GmServiceRepresentation serviceRepresentation) {
 		
 		super(bcConfiguration);
-
+		
 		System.out.println("MediatorHttpsSubcomponent --> "+this.bcConfiguration.getSubcomponentRole());
 
 		setGmServiceRepresentation(serviceRepresentation);
@@ -86,6 +88,9 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 		System.out.println("this.bcConfiguration.getSubcomponentAddress(): "+this.bcConfiguration.getSubcomponentAddress());
 		String[] parts = this.bcConfiguration.getSubcomponentAddress().split(":");
 		
+		JKSPathBus = this.bcConfiguration.getJKSPathBus();
+		JKSPathService = this.bcConfiguration.getJKSPathService();
+
 		if (parts.length == 2) {
             hostAddress = parts[0];
             port = parts[1];}
@@ -114,7 +119,7 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 
 		server = new Server();
 		try {
-			SSLconf(restservicePort, hostAddress, server);
+			SSLconf(restservicePort, hostAddress, server, "Bus");
 			System.out.println("restservicePort: "+restservicePort);
 			System.out.println("hostAddress: "+hostAddress);
 			
@@ -146,7 +151,7 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 			
 			server_client = new Server();
 			try {
-				SSLconf(port_https_client, hostAddress, server_client);
+				SSLconf(port_https_client, hostAddress, server_client, "Service");
 				
 			} catch (UnrecoverableKeyException e) {
 				// TODO Auto-generated catch block
@@ -382,8 +387,10 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 	// This is used to configure the SSL certificate
-	public static void SSLconf (int port, String host, Server server) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyStoreException {
+	public static void SSLconf (int port, String host, Server server, String type) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyStoreException {
     	// Configure SSL
         // Load your keystore (containing your SSL certificate) and truststore if needed
         KeyStore keyStore = null;
@@ -393,10 +400,20 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        try (FileInputStream keyStoreFile = new FileInputStream("/Users/zbenomar/eclipse-workspace/Testjetty2/src/main/java/testjetty2/mykeystore.jks")) {
-            keyStore.load(keyStoreFile, "testtest".toCharArray());
-        }
+        //try (FileInputStream keyStoreFile = new FileInputStream("/Users/zbenomar/eclipse-workspace/Testjetty2/src/main/java/testjetty2/mykeystore.jks")) {
         
+		if (type=="Bus") {
+			try (FileInputStream keyStoreFile = new FileInputStream(JKSPathBus)){
+	        	keyStore.load(keyStoreFile, "testtest".toCharArray());
+			}	
+		}
+		
+		else if (type=="Service") {
+			try (FileInputStream keyStoreFile = new FileInputStream(JKSPathService)){
+	        	keyStore.load(keyStoreFile, "testtest".toCharArray());
+		}
+		}
+		
      // Initialize KeyManagerFactory with the keystore
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(keyStore, "testtest".toCharArray());
@@ -514,7 +531,7 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 			}
 			processing(receivedText);
 
-	    }
+		}
 	
 	}
 	public static void processing(String receivedText) {
@@ -547,13 +564,13 @@ public class MediatorHttpsSubcomponent extends MediatorGmSubcomponent {
 					datas.add(d);
 					// System.err.println("Added " + d);
 				}
-				Data d = new Data<String>("op_name", "String", true, op_name, "BODY");
+				//Data d = new Data<String>("op_name", "String", true, op_name, "BODY");
 				//datas.add(d);
-				if(!message_id.equals("")){
+				//if(!message_id.equals("")){
 					
-					d = new Data<String>("message_id", "String", true, message_id, "BODY");
-					datas.add(d);
-				}
+				//	d = new Data<String>("message_id", "String", true, message_id, "BODY");
+				//	datas.add(d);
+				//}
 				
 				if (op.getOperationType() == OperationType.TWO_WAY_SYNC) {
 

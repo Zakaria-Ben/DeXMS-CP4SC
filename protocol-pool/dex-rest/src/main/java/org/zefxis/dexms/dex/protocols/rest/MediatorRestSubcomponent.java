@@ -66,6 +66,8 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 	private ExecutorService executor = null;
 	private static String op_name = null;
 	private static Operation op = null;
+	private static String hostAddress;
+	private static String port;
 	private BlockingQueue<String> waitingQueue = new LinkedBlockingDeque<>();
 
 
@@ -75,11 +77,11 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			MediatorConfiguration bcConfiguration, GmServiceRepresentation serviceRepresentation
 
 	) {
-
 		super(bcConfiguration);
 		
-		System.out.println("MediatorRestSubcomponent --> "+this.bcConfiguration.getSubcomponentRole());
-		this.bcRestSubcomponent = this;
+
+		System.out.println("MediatorHttpsSubcomponent --> "+this.bcConfiguration.getSubcomponentRole());
+
 		setGmServiceRepresentation(serviceRepresentation);
 		System.out.print("serviceRepresentation:"+serviceRepresentation.getInterfaces().get(0).getOperations().entrySet());
 		for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations().entrySet()) {
@@ -87,8 +89,18 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			op_name = en.getKey();
 			op = en.getValue();
 		}
-		System.out.println("op_name"+op_name);
-
+		this.bcRestSubcomponent = this;
+		System.out.println("this.bcConfiguration.getSubcomponentAddress(): "+this.bcConfiguration.getSubcomponentAddress());
+		String[] parts = this.bcConfiguration.getSubcomponentAddress().split(":");
+		
+		if (parts.length == 2) {
+            hostAddress = parts[0];
+            port = parts[1];}
+            else {
+            	hostAddress = parts[0];	
+                port = String.valueOf(this.bcConfiguration.getSubcomponentPort());;
+            }
+      
 		int restservicePort = Integer.valueOf(bcConfiguration.getServicePort());
 		switch (this.bcConfiguration.getSubcomponentRole()) {
 
@@ -129,7 +141,7 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			// this.component.setDefaultHost(this.bcConfiguration.getSubcomponentAddress());
 			// this.component.getDefaultHost().attach("/",
 			// RestServerResource.class);
-			this.component.getDefaultHost().attach("/"+op_name, new RestletRestService());
+			this.component.getDefaultHost().attach("/"+op_name+"/", new RestletRestService());
 
 			break;
 		case CLIENT:
@@ -141,7 +153,7 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-			this.printerComponent.getDefaultHost().attach("/postedmessage", RestServerResource.class);
+			this.printerComponent.getDefaultHost().attach("/postedmessage/", RestServerResource.class);
 			break;
 		default:
 			break;
@@ -200,7 +212,8 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 		
 		try {
 		Request request = new Request();
-		String URL = "http://"+bcConfiguration.getServiceAddress()+":"+bcConfiguration.getSubcomponentPort()+"/"+op_name;
+		String URL = "http://"+bcConfiguration.getServiceAddress()+":"+bcConfiguration.getSubcomponentPort()+"/"+op_name+"/";
+		//String URL = "http://"+bcConfiguration.getServiceAddress()+":"+"4000"+"/"+op_name+"/";
 		request.setResourceRef(URL);
 		System.out.println("I'm sending the POST request");
 		request.setMethod(Method.POST);
@@ -563,11 +576,12 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 		//this.notifyStartEvent();	
 		//String op_name = (String) jsonObject.get("op_name");
 		//System.out.print("serviceRepresentation:"+serviceRepresentation.getInterfaces().get(0).getOperations().entrySet());
+		List<Data<?>> datas = new ArrayList<>();
 		
 		//for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations().entrySet()) {
 		//	if (en.getKey().equals(op_name)) {
 		//		Operation op = en.getValue();
-				List<Data<?>> datas = new ArrayList<>();
+				
 				System.out.println("Starting the loop 1");
 				for (Data<?> data : op.getGetDatas()) {
 					Data d = new Data<String>(data.getName(), "String", true, (String) jsonObject.get(data.getName()),
@@ -576,13 +590,13 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 					System.out.println("Added to datas");
 					// System.err.println("Added " + d);
 				}
-				Data d = new Data<String>("op_name", "String", true, op_name, "BODY");
-				datas.add(d);
-				if(!message_id.equals("")){
+				//Data d = new Data<String>("op_name", "String", true, op_name, "BODY");
+				//datas.add(d);
+				//if(!message_id.equals("")){
 					
-					d = new Data<String>("message_id", "String", true, message_id, "BODY");
-					datas.add(d);
-				}
+				//	d = new Data<String>("message_id", "String", true, message_id, "BODY");
+				//	datas.add(d);
+				//}
 				
 				if (op.getOperationType() == OperationType.TWO_WAY_SYNC) {
 					String response = bcRestSubcomponent.mgetTwowaySync(op.getScope(), datas);
@@ -599,13 +613,9 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 					System.out.println("Terminated");
 				}
 			}
-		
-		
-		
-		
+//}
 		
 	
-
 	public class SendMessage extends Thread {
 
 		String message = null;

@@ -39,6 +39,7 @@ public class DexmsMediatorResource extends ServerResource {
 		String protocol = null;
 		String interfaceService = null;
 		String service_name = null;
+		String JKS = null;
 
 		try {
 
@@ -98,7 +99,7 @@ public class DexmsMediatorResource extends ServerResource {
 			return new ObjectRepresentation<MediatorOutput>(mediatorOutput);
 		}
 		MediatorGenerator mediator = new MediatorGenerator();
-		MediatorOutput mediatorOutput = mediator.generateWar(byteArray, busProtocol, service_name);
+		MediatorOutput mediatorOutput = mediator.generateWar(byteArray, busProtocol, service_name, JKS);
 		return new ObjectRepresentation<MediatorOutput>(mediatorOutput);
 	}
 
