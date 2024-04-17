@@ -61,6 +61,7 @@ public class Data<T> {
 		this.object = object;
 	}
 
+	
 	// Alias for passing context and media as a String and set isRequired = true by
 	// default
 	public Data(String name, String className, boolean isPrimitiveType,
@@ -89,6 +90,7 @@ public class Data<T> {
 	public Data(String name, String className, boolean isPrimitiveType, T object) {
 		this(name, className, isPrimitiveType, object, MediaType.JSON, Context.BODY, true);
 	}
+
 
 	public void setName(String name) {
 		this.name = name;
