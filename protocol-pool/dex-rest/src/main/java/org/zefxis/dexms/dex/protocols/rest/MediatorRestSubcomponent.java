@@ -3,11 +3,15 @@
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +48,14 @@ import org.zefxis.dexms.gmdl.utils.Scope;
 import org.zefxis.dexms.gmdl.utils.enums.OperationType;
 import org.zefxis.dexms.tools.logger.GLog;
 import org.zefxis.dexms.tools.logger.Logger;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.SynchronousQueue;
@@ -138,9 +150,7 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			// this.component.setDefaultHost(this.bcConfiguration.getSubcomponentAddress());
-			// this.component.getDefaultHost().attach("/",
-			// RestServerResource.class);
+
 			this.component.getDefaultHost().attach("/"+op_name+"/", new RestletRestService());
 
 			break;
@@ -189,17 +199,21 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 	@Override
 	public void postOneway(final String destination, final Scope scope, final List<Data<?>> datas, final long lease) {
 		System.out.println("This is PostOneWay for REST");
+		
+		LinkedHashMap<String, Object> obj = new LinkedHashMap<String, Object>();
+
+		GsonBuilder builder = new GsonBuilder();
+	    Gson gson = builder.create();
 		JSONObject msgObj = new JSONObject();
+		System.out.println("This is the list I'm receiving HTTP:" + datas.toString());
+		
 		String message_id = "";
 		for (Data d : datas) {
 			
-			System.out.println("d.getObject():" + d.getObject());
-			System.out.println("Type:"+ d.getObject().getClass().getName());
-			System.out.println("Type:"+ d.getObject().getClass().getName());
-			
 			if (!d.getName().equals("message_id")) {
-
-				msgObj.put(d.getName(), d.getObject());
+				System.out.println("type of data: "+ d.getObject().getClass());
+				obj.put(d.getName(), d.getObject());
+				System.out.println(obj);
 
 			} else {
 
@@ -207,13 +221,46 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			}
 
 		}
+
 		
-		message = msgObj.toJSONString();
+		List<Map<String, Object>> perceivedObjectProperties = new ArrayList<>();
+		LinkedHashMap<String, Object> content = new LinkedHashMap<>();
+		content.put("ySpeedValue", 1);
+		content.put("objectIDValue", 2);
+		content.put("xDistanceValue", 3);
+		content.put("xSpeedValue", 4);
+		content.put("yDistanceValue", 5);
+		
+		
+		
+		perceivedObjectProperties.add(content);
+		
+		System.out.println("This is the content of the list: "+perceivedObjectProperties);
+		
+		obj.remove("perceivedObjectProperties");
+		obj.put("perceivedObjectProperties", perceivedObjectProperties);
+		
+		System.out.println("This is the hashMap of the JSON: "+obj);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, true);
+		
+		try {
+			message = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+			
+			
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("message before replacement:" + message);	
+
 		if(!message_id.equals("")){
 			
-			message = msgObj.toJSONString() + "-" + message_id;
 		}
-		
+	
+        
+  	
 		System.out.println("this is what I'm posting with HTTP: "+ message);
 		try {
 		Request request = new Request();
@@ -446,12 +493,6 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			        String data_queue;
 					data_queue = ((LinkedBlockingDeque<String>) waitingQueue).peekLast();
 
-//			        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-//			            StringBuilder content = new StringBuilder();
-//			            String line;
-//			            while ((line = reader.readLine()) != null) {
-//			                content.append(line);
-//			            }
 
 					response.setEntity(data_queue.toString(), MediaType.APPLICATION_ALL_JSON);
 					response.setStatus(Status.SUCCESS_OK);
@@ -461,24 +502,9 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			    }
 			}
 				
-				
-				//executor.execute(new Runnable() {
-
-					//@Override
-					//public void run() {
-
-						//resp.setStatus(Status.SUCCESS_OK);
-						// resp.setEntity("OK Receive:)",
-						// MediaType.TEXT_PLAIN);
-						// resp.commit();
-						//return;
-					//}
-				//});
+			
 			}
 
-		//}
-
-	//}
 
 	public static class RestServerResource extends ServerResource{
 
@@ -492,7 +518,7 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 				
 			}
 
-			//System.err.println(receivedText);
+
 			System.out.println("This is the test I received: "+receivedText);
 			bcRestSubcomponent.processing(receivedText);
 			System.out.println("Processing Done");
@@ -531,22 +557,9 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 				// GLog.log.e(TAG, "Class cast exeption: " + nfe);
 			}
 
-			// Message_CS msg = new Message_CS("", 0, source, port, "GET",
-			// remainingPart, "", connectionTimeout, "", 0);
-			//
-			// fr.inria.arles.lsb.commons.Response lsbResponse = null;
-			//
-			// if (callback == null) {
-			// lsbResponse = connectorRef.invokeSync(msg);
-			// } else {
-			// lsbResponse = connectorRef.invokeAsync(msg);
-			// }
 
 			org.restlet.Response restletResponse = null;
-			// restletResponse = getResponse();getResponse();
-			// restletResponse.setStatus(lsbResponse.get_respStatus());
-			// restletResponse.setEntity(new
-			// StringRepresentation(lsbResponse.getDataString()));
+
 			return restletResponse;
 		}
 
@@ -574,34 +587,16 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 			System.out.println("this is the error");
 			e.printStackTrace();
 		}
-		//String op_name = "randomValue";	
-		
-		//String op_name = (String) jsonObject.get("op_name");
-		//System.out.print("This is the op name :"+op_name);
-		//this.notifyStartEvent();	
-		//String op_name = (String) jsonObject.get("op_name");
-		//System.out.print("serviceRepresentation:"+serviceRepresentation.getInterfaces().get(0).getOperations().entrySet());
+
 		List<Data<?>> datas = new ArrayList<>();
 		
-		//for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations().entrySet()) {
-		//	if (en.getKey().equals(op_name)) {
-		//		Operation op = en.getValue();
 				
-				System.out.println("Starting the loop 1");
 				for (Data<?> data : op.getGetDatas()) {
 					Data d = new Data<String>(data.getName(), "String", true, (String) jsonObject.get(data.getName()),
 							data.getContext(), data.getMediaType());
 					datas.add(d);
-					System.out.println("Added to datas");
-					// System.err.println("Added " + d);
 				}
-				//Data d = new Data<String>("op_name", "String", true, op_name, "BODY");
-				//datas.add(d);
-				//if(!message_id.equals("")){
-					
-				//	d = new Data<String>("message_id", "String", true, message_id, "BODY");
-				//	datas.add(d);
-				//}
+
 				
 				if (op.getOperationType() == OperationType.TWO_WAY_SYNC) {
 					String response = bcRestSubcomponent.mgetTwowaySync(op.getScope(), datas);
@@ -653,4 +648,69 @@ public class MediatorRestSubcomponent extends MediatorGmSubcomponent {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
+	// Generic method to parse all lists contained within the message
+    public static Map<Object, List<Object>> parseListsFromMessage(String jsonResponse) throws Exception {
+        // Create ObjectMapper instance
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Deserialize the JSON response to a Map<String, Object>
+        TypeReference<Map<String, Object>> mapType = new TypeReference<Map<String, Object>>() {};
+        Map<String, Object> messageMap = mapper.readValue(jsonResponse, mapType);
+
+        // Initialize a map to store parsed lists
+        Map<Object, List<Object>> parsedLists = new HashMap<>();
+
+        // Iterate over all entries in the message map
+        for (Map.Entry<String, Object> entry : messageMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // Check if the value is a string representing a JSON array
+            if (value instanceof String && ((String) value).startsWith("[")) {
+                // Deserialize the string to a JSON array
+                List<Object> list = mapper.readValue((String) value, new TypeReference<List<Object>>() {});
+
+                // Add the list to the parsedLists map
+                parsedLists.put(key, list);
+            }
+        }
+
+        return parsedLists;
+    }
+    
+    
+    
+    private static List<String> getKeysForListStrings(LinkedHashMap<String, Object> map) {
+        List<String> keys = new ArrayList<>();
+
+        // Iterate through the entries of the map
+        for (Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // Check if the value starts and ends with square brackets
+            if (value instanceof String && ((String) value).startsWith("[") && ((String) value).endsWith("]")) {
+                keys.add(key); // Found a list representation string, add the key to the list
+            }
+        }
+        return keys; // Return the list of keys associated with list representation strings
+    }
+    private static List<String> getValuesForListStrings(LinkedHashMap<String, Object> map) {
+        List<String> values = new ArrayList<>();
+
+        // Iterate through the entries of the map
+        for (java.util.Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // Check if the value starts and ends with square brackets
+            if (((String) value).startsWith("[") && ((String) value).endsWith("]")) {
+                values.add((String) value); // Found a list representation string, add the key to the list
+            }
+        }
+        return values; // Return the list of keys associated with list representation strings
+    }
+    
 }

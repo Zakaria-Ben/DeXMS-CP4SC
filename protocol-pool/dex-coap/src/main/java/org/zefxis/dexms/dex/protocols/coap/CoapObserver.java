@@ -84,6 +84,7 @@ public class CoapObserver implements Runnable {
 							e.printStackTrace();
 						}
 						
+						// Better to check the type fron the GIDL file. Think how to change it
 
 						List<Data<?>> datas = new ArrayList<>();
 

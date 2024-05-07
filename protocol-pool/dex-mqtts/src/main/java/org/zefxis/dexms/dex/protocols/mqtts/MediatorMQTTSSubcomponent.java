@@ -66,10 +66,6 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 		JKSPathService = this.bcConfiguration.getJKSPathService();
 		
 		
-		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
-		System.out.println("JKSPathBus: "+JKSPathBus);
-		System.out.println("JKSPathBus: "+ JKSPathService);
-		
 		
 		for (Entry<String, Operation> en : serviceRepresentation.getInterfaces().get(0).getOperations().entrySet()) {
 
@@ -164,9 +160,7 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			System.out.println("subscriber");
-			
-			System.out.println(" ServiceRepresentation  "+(Object) serviceRepresentation.toString());
+
         
 			//client.connect(options);
         
@@ -196,21 +190,10 @@ public class MediatorMQTTSSubcomponent extends MediatorGmSubcomponent{
 			break;
 			
 			
-			
-			
-//			String topic = this.bcConfiguration.get;
-//			try {
-//				client.subscribe(topic);
-//			} catch (MqttException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-
-//			break;
+		
 
 		default:
 
-//			break;
 		}
 	}
 

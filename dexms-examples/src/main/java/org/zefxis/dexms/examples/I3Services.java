@@ -13,8 +13,8 @@ public class I3Services {
 			MediatorGenerator mediator = new MediatorGenerator();
 
 			// Corresponds to the IP address and port number of the MQTT broker
-			//mediator.setServiceEndpoint("localhost", "2032");
-			mediator.setServiceEndpoint("localhost", "3000");
+			mediator.setServiceEndpoint("localhost", "2032");
+			//mediator.setServiceEndpoint("localhost", "3000");
 			// Corresponds to the IP address and port number of the CoAP endpoint
 			mediator.setBusEndpoint("localhost", "4000");
 			
@@ -24,9 +24,9 @@ public class I3Services {
 			mediator.setServiceEndpointSecurity("/Users/zbenomar/Desktop/CP4SC-Demo/DeXMS-CP4SC/dexms-examples/keystore.jks");
 			
 			String gidlFile = "src/main/java/org/zefxis/dexms/examples/randomValue.gidl";
-			MediatorOutput output = mediator.generate(gidlFile, ProtocolType.REST, "CoAP_to_HTTP");
+			MediatorOutput output = mediator.generate(gidlFile, ProtocolType.REST, "MQTTS_to_HTTP");
 			try {
-				FileUtils.writeByteArrayToFile(new File("CoAP_to_HTTP.jar"), output.jar);
+				FileUtils.writeByteArrayToFile(new File("MQTTS_to_HTTP.jar"), output.jar);
 			} 
 			catch (IOException e) {e.printStackTrace();}
 			

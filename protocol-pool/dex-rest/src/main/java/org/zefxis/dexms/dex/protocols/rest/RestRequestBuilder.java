@@ -39,24 +39,14 @@ public class RestRequestBuilder implements RequestBuilder {
 	}
 
 	public static Request buildRestGetRequest(final String destination, final Scope scope, final List<Data<?>> datas) {
-		System.out.println("I'm building the GET request");
-		System.out.println("I'm building the GET request");
-		System.out.println("I'm building the GET request");
-		System.out.println("I'm building the GET request");
-		System.out.println("I'm building the GET request");
-		System.out.println("I'm building the GET request");
+
 		return buildRestRequest(Method.GET, destination, scope, datas);
 	}
 
 	private static Request buildRestRequest(final Method method, final String destination, final Scope scope,
 			final List<Data<?>> datas) {
 		Request request = new Request();
-		System.out.println("I'm building the request");
-		System.out.println("I'm building the request");
-		System.out.println("I'm building the request");
-		System.out.println("I'm building the request");
-		System.out.println("I'm building the request");
-		System.out.println("I'm building the request");
+
 		request.setResourceRef("");
 
 		UriBuilder builder = UriBuilder.fromPath(destination + scope.getUri());
